@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply m-0 bg-background font-sans text-ink antialiased;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+
+  button,
+  a,
+  input,
+  [role='button'] {
+    @apply touch-manipulation;
+  }
+}
+
+@layer components {
+  .skip-link {
+    @apply absolute left-4 top-0 z-50 -translate-y-full rounded-button bg-primary px-4 py-3 text-sm font-semibold text-white transition focus:translate-y-4;
+  }
+
+  .surface-card {
+    @apply rounded-card border border-border/80 bg-card p-5 shadow-card transition duration-300;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .surface-card-hover {
+    @apply hover:-translate-y-1 hover:border-primary/20 hover:shadow-softHover;
+  }
+}

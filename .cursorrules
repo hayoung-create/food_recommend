@@ -1,0 +1,336 @@
+# NutriPick Cursor Rules
+
+You are a senior Full Stack Engineer.
+
+The goal is to build a clean, modern, production-quality MVP.
+
+Always prioritize readability, maintainability and reusable components.
+
+Do not over-engineer.
+
+---------------------------------------------------
+General
+---------------------------------------------------
+
+- Use React + TypeScript
+- Use Vite
+- Use TailwindCSS
+- Use FastAPI
+- Use SQLite
+- Use Pandas
+- Use Chart.js
+- Use Lucide React icons
+
+Never use Bootstrap.
+
+Never use jQuery.
+
+Never use inline CSS.
+
+---------------------------------------------------
+Project Structure
+---------------------------------------------------
+
+frontend/
+
+components/
+
+pages/
+
+hooks/
+
+services/
+
+types/
+
+utils/
+
+assets/
+
+backend/
+
+api/
+
+models/
+
+database/
+
+services/
+
+scripts/
+
+---------------------------------------------------
+Coding Style
+---------------------------------------------------
+
+Use functional components only.
+
+Use TypeScript strictly.
+
+Never use "any".
+
+Always create reusable components.
+
+Keep components under 200 lines.
+
+Separate UI and business logic.
+
+Never duplicate code.
+
+---------------------------------------------------
+Naming
+---------------------------------------------------
+
+Use English for variables.
+
+Use camelCase.
+
+Use PascalCase for Components.
+
+Use kebab-case for folders.
+
+Example
+
+FoodCard.tsx
+
+RecommendationPage.tsx
+
+recommendationService.ts
+
+---------------------------------------------------
+Styling
+---------------------------------------------------
+
+Follow DESIGN_SYSTEM.md.
+
+Do not invent new colors.
+
+Only use colors defined in DESIGN_SYSTEM.md.
+
+Spacing should be consistent.
+
+Use Tailwind utilities.
+
+No inline styles.
+
+---------------------------------------------------
+UI Rules
+---------------------------------------------------
+
+The UI must match
+
+reference/main.png
+
+reference/recommend.png
+
+reference/detail.png
+
+as closely as possible.
+
+Keep large whitespace.
+
+Rounded cards.
+
+Soft shadows.
+
+Green healthcare theme.
+
+Desktop first.
+
+Responsive.
+
+---------------------------------------------------
+Cards
+---------------------------------------------------
+
+Cards must have
+
+White background
+
+Rounded corners
+
+Soft shadow
+
+Hover animation
+
+Padding 20px
+
+---------------------------------------------------
+Buttons
+---------------------------------------------------
+
+Primary
+
+Green
+
+Secondary
+
+White
+
+Radius 12px
+
+Height 56px
+
+---------------------------------------------------
+Recommendation Logic
+---------------------------------------------------
+
+Never hardcode recommendations.
+
+Always calculate recommendation score.
+
+Use the algorithm defined in PRD.md.
+
+Normalize data before scoring.
+
+Support
+
+Diet
+
+High Protein
+
+Low Sodium
+
+Low Sugar
+
+---------------------------------------------------
+API
+---------------------------------------------------
+
+Never hardcode API keys.
+
+Read API key from
+
+.env
+
+Backend only.
+
+Frontend must never expose API key.
+
+---------------------------------------------------
+Database
+---------------------------------------------------
+
+Collect data only once.
+
+Save into SQLite.
+
+Read recommendations from SQLite.
+
+Do not call public API every request.
+
+---------------------------------------------------
+Charts
+---------------------------------------------------
+
+Use Chart.js.
+
+Bar Chart only.
+
+Keep charts simple.
+
+Primary color
+
+Green.
+
+---------------------------------------------------
+Search
+---------------------------------------------------
+
+Support product name search.
+
+Ignore whitespace.
+
+Ignore case.
+
+---------------------------------------------------
+Performance
+---------------------------------------------------
+
+Avoid unnecessary rendering.
+
+Use memoization when needed.
+
+Lazy load pages.
+
+Keep response under 3 seconds.
+
+---------------------------------------------------
+Accessibility
+---------------------------------------------------
+
+Keyboard navigation.
+
+Focus state.
+
+Color contrast.
+
+Minimum button height
+
+44px.
+
+---------------------------------------------------
+Code Quality
+---------------------------------------------------
+
+Always explain major implementation decisions.
+
+Use comments only when necessary.
+
+No dead code.
+
+No console.log in production.
+
+---------------------------------------------------
+Git
+---------------------------------------------------
+
+Small commits.
+
+Meaningful commit messages.
+
+---------------------------------------------------
+Development Process
+---------------------------------------------------
+
+Never implement everything at once.
+
+Always work step by step.
+
+Before each implementation,
+
+explain what will be built.
+
+Wait until the previous task is complete.
+
+---------------------------------------------------
+Important
+---------------------------------------------------
+
+Read these documents first:
+
+docs/PRD.md
+
+docs/UI_GUIDE.md
+
+docs/DESIGN_SYSTEM.md
+
+Use them as the single source of truth.
+
+Do not ignore them.
+
+If conflicts occur,
+
+follow
+
+PRD
+
+↓
+
+UI_GUIDE
+
+↓
+
+DESIGN_SYSTEM
+
+in this priority order.
