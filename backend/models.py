@@ -13,7 +13,8 @@ class Product(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     food_cd: Optional[str] = Field(default=None, index=True, unique=True)
     name: str = Field(index=True)
-    category: Optional[str] = Field(default=None, index=True)
+    category: Optional[str] = Field(default=None, index=True)  # FOOD_CAT1_NM 대분류
+    category2: Optional[str] = Field(default=None, index=True)  # FOOD_REF_NM 대표식품명(중분류 UI)
     maker: Optional[str] = Field(default=None)
     serving_size: Optional[str] = Field(default=None)
 

@@ -61,7 +61,7 @@ food_recommend/
 - 추천 결과 3초 이내 (SQLite 조회 기준)
 - 목표별 TOP5 제공
 - 상세에서 영양성분·추천 이유·막대그래프 확인
-- 식품분류 선택 시 카테고리 내 재정규화
+- 식품분류 선택 시 대분류·중분류(대표식품명)로 후보 필터
 
 ---
 
@@ -102,7 +102,7 @@ food_recommend/
 4. `recommend_score = round(score * 100)`
 5. 동점 시 단백질 높은 순
 6. 전체 식품 기준 TOP5
-7. 카테고리 지정 시 **해당 분류 내 재정규화** TOP5
+7. 카테고리/중분류 지정 시 **해당 범위 제품만** 점수 정렬
 8. 분류 제품 수 &lt; 5 → `lowSampleWarning` 플래그
 9. 추천 이유 문구 생성 (임계값 미충족 시 기본 문구)
 
@@ -118,9 +118,9 @@ food_recommend/
 |--------|------|------|
 | GET | `/health` | 기존 유지 |
 | GET | `/api/goals` | 건강 목표 목록 |
-| GET | `/api/categories` | DB 식품분류 동적 목록 |
-| GET | `/api/recommendations?goal=&category=` | TOP5 (category 옵션) |
-| GET | `/api/products/{id}?goal=&category=` | 상세 + 점수 + 이유 + 차트용 평균 |
+| GET | `/api/categories` | 대분류·중분류 계층 목록 (`name`, `count`, `children`) |
+| GET | `/api/recommendations?goal=&category=&category2=` | 추천 목록 (대/중분류 옵션) |
+| GET | `/api/products/{id}?goal=&category=&category2=` | 상세 + 점수 + 이유 + 차트용 평균 |
 | GET | `/api/search?q=&category=` | 식품명 검색 (공백·대소문자 무시) |
 
 런타임에는 공공 API를 호출하지 않는다.
@@ -152,7 +152,7 @@ food_recommend/
 ### Phase F — 프론트엔드: 추천 결과
 
 1. 선택한 목표 배너
-2. 식품분류 칩 (클릭 시 TOP5 재요청)
+2. 식품분류 2단 칩 (대분류 → 중분류, 클릭 시 추천 재요청)
 3. TOP5 카드 (제품명, 분류, 칼로리, 단백질, 점수)
 4. 표본 부족·점수 안내 문구
 5. 카드 클릭 → 상세 이동

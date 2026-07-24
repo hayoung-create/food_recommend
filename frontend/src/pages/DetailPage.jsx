@@ -17,6 +17,7 @@ export default function DetailPage() {
   const [searchParams] = useSearchParams()
   const goal = searchParams.get('goal') || 'diet'
   const category = searchParams.get('category')
+  const category2 = searchParams.get('category2')
 
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -28,7 +29,7 @@ export default function DetailPage() {
     setLoading(true)
     setError(null)
 
-    fetchProduct(id, goal, category || undefined)
+    fetchProduct(id, goal, category || undefined, category2 || undefined)
       .then((data) => {
         if (cancelled) return
         setProduct(data)
@@ -45,7 +46,7 @@ export default function DetailPage() {
     return () => {
       cancelled = true
     }
-  }, [id, goal, category, retryKey])
+  }, [id, goal, category, category2, retryKey])
 
   const scopeLabel = product?.scoreScopeCategory
     ? `「${product.scoreScopeCategory}」 분류 기준`

@@ -19,6 +19,8 @@
 | `food_cd` | `FOOD_CD` | unique 키 (upsert용) |
 | `name` | `FOOD_NM_KR` | 식품명 |
 | `category` | `FOOD_CAT1_NM` | 식품대분류 (밥류, 면 및 만두류 등) |
+| `category2` | `FOOD_REF_NM` | 대표식품명 — UI 중분류 칩 (김밥, 국밥, 덮밥 등). `FOOD_CAT2_NM`은 토핑/세부 변형에 가까워 중분류로 부적합 |
+
 | `maker` | `MAKER_NM` | 필드 존재. 품목대표는 자주 null → UI "정보 없음" |
 | `serving_size` | `SERVING_SIZE` | 샘플 기준 대부분 `100g` |
 | `calories` | `AMT_NUM1` | 에너지(kcal) |

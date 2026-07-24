@@ -35,14 +35,16 @@ export async function fetchCategories() {
 export async function fetchRecommendations(goal, category, options = {}) {
   const params = new URLSearchParams({ goal })
   if (category) params.set('category', category)
+  if (options.category2) params.set('category2', options.category2)
   if (options.page) params.set('page', String(options.page))
   if (options.pageSize) params.set('pageSize', String(options.pageSize))
   return request(`/api/recommendations?${params}`)
 }
 
-export async function fetchProduct(id, goal, category) {
+export async function fetchProduct(id, goal, category, category2) {
   const params = new URLSearchParams({ goal: goal || 'diet' })
   if (category) params.set('category', category)
+  if (category2) params.set('category2', category2)
   return request(`/api/products/${id}?${params}`)
 }
 

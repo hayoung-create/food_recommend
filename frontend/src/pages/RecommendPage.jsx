@@ -22,6 +22,7 @@ export default function RecommendPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const goal = searchParams.get('goal')
   const category = searchParams.get('category')
+  const category2 = searchParams.get('category2')
   const pageParam = Number(searchParams.get('page') || '1')
   const page = Number.isFinite(pageParam) && pageParam >= 1 ? pageParam : 1
   const isValidGoal = Boolean(goal && GOAL_META[goal])
@@ -41,11 +42,17 @@ export default function RecommendPage() {
   const [selectedIds, setSelectedIds] = useState([])
   const [limitMessage, setLimitMessage] = useState(null)
 
+  const scopeLabel = category2
+    ? `「${category} › ${category2}」`
+    : category
+      ? `「${category}」`
+      : null
+
   // 분류·목표가 바뀌면 비교 선택만 초기화 (페이지 이동 시 선택은 유지)
   useEffect(() => {
     setSelectedIds([])
     setLimitMessage(null)
-  }, [goal, category])
+  }, [goal, category, category2])
 
   useEffect(() => {
     if (!isValidGoal) return
@@ -80,6 +87,7 @@ export default function RecommendPage() {
     setRecoError(null)
 
     fetchRecommendations(goal, category || undefined, {
+      category2: category2 || undefined,
       page,
       pageSize: PAGE_SIZE,
     })
@@ -105,7 +113,7 @@ export default function RecommendPage() {
     return () => {
       cancelled = true
     }
-  }, [isValidGoal, goal, category, page, retryKey])
+  }, [isValidGoal, goal, category, category2, page, retryKey])
 
   useEffect(() => {
     if (totalPages > 0 && page > totalPages) {
@@ -122,6 +130,21 @@ export default function RecommendPage() {
         next.set('category', nextCategory)
       } else {
         next.delete('category')
+      }
+      next.delete('category2')
+      next.delete('page')
+      setSearchParams(next, { replace: true })
+    },
+    [searchParams, setSearchParams],
+  )
+
+  const handleSelectCategory2 = useCallback(
+    (nextCategory2) => {
+      const next = new URLSearchParams(searchParams)
+      if (nextCategory2) {
+        next.set('category2', nextCategory2)
+      } else {
+        next.delete('category2')
       }
       next.delete('page')
       setSearchParams(next, { replace: true })
@@ -169,6 +192,7 @@ export default function RecommendPage() {
       ids: selectedIds.join(','),
     })
     if (category) params.set('category', category)
+    if (category2) params.set('category2', category2)
     navigate(`/compare?${params}`)
   }
 
@@ -187,7 +211,9 @@ export default function RecommendPage() {
             <CategoryChips
               categories={categories}
               selectedCategory={category}
-              onSelect={handleSelectCategory}
+              selectedCategory2={category2}
+              onSelectCategory={handleSelectCategory}
+              onSelectCategory2={handleSelectCategory2}
               loading={categoriesLoading}
               error={categoriesError}
             />
@@ -199,9 +225,9 @@ export default function RecommendPage() {
                   <p className="mt-1 text-sm text-ink-muted">
                     점수가 높을수록 목표에 더 적합한 제품입니다. 한 페이지에{' '}
                     {PAGE_SIZE}개씩 표시됩니다.
-                    {category
-                      ? ` 점수는 「${category}」 분류 안에서만 다시 계산된 값입니다.`
-                      : ' 점수는 전체 식품 기준으로 계산된 값입니다.'}
+                    {scopeLabel
+                      ? ` ${scopeLabel} 분류 제품만 대상으로 정렬합니다.`
+                      : ' 전체 식품을 대상으로 정렬합니다.'}
                   </p>
                 </div>
                 <p
@@ -258,6 +284,7 @@ export default function RecommendPage() {
                           product={product}
                           goal={goal}
                           category={category || undefined}
+                          category2={category2 || undefined}
                           selectable
                           selected={selectedIds.some(
                             (value) => Number(value) === Number(product.id),
@@ -284,9 +311,9 @@ export default function RecommendPage() {
               <p>
                 추천 목록은 전체 점수순이며, 제품 비교는 최대 {MAX_COMPARE}개까지
                 선택할 수 있습니다.
-                {category
-                  ? ` 점수는 「${category}」 분류 내 비교 기준입니다.`
-                  : ' 점수는 전체 식품 비교 기준입니다.'}
+                {scopeLabel
+                  ? ` ${scopeLabel} 분류 제품만 대상으로 비교·정렬합니다.`
+                  : ' 전체 식품을 대상으로 비교·정렬합니다.'}
               </p>
             </div>
           </>

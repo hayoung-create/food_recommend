@@ -10,7 +10,7 @@
 ## 주요 기능
 
 - 건강 목표 기반 추천 점수 (Min-Max 정규화 · 목표별 가중치)
-- 식품분류 선택 시 **분류 내 재정규화**
+- 식품분류 선택 시 **대분류 → 중분류(대표식품명) 2단 필터**
 - 추천 목록 페이지네이션 (10개씩)
 - 제품 상세: Health Score, 영양 신호등 카드, 막대 차트, 추천 이유
 - 제품 검색 (식품명 · 분류 필터, 분류만으로도 조회 가능)
@@ -124,7 +124,7 @@ npm run dev
 ## 화면 흐름
 
 1. **홈** — 건강 목표 선택 → 추천받기  
-2. **추천 결과** — 식품분류 칩 · 점수순 목록(페이지당 10개) · 비교용 체크(최대 5개)  
+2. **추천 결과** — 대/중분류 칩 · 점수순 목록(페이지당 10개) · 비교용 체크(최대 5개)
 3. **제품 상세** — Health Score · 영양 카드 · 차트 · 추천 이유  
 4. **검색** — 식품명/분류 검색 · 결과에서도 비교 선택 가능  
 5. **비교** (`/compare`) — 테이블 · Scatter(목표 축) · Radar(상위 3개 프로필)
@@ -136,9 +136,9 @@ npm run dev
 | Method | Path | 설명 |
 |--------|------|------|
 | GET | `/api/goals` | 건강 목표 목록 |
-| GET | `/api/categories` | 식품분류 목록 |
-| GET | `/api/recommendations?goal=&category=&page=&pageSize=` | 추천 목록 (기본 pageSize=10) |
-| GET | `/api/products/{id}?goal=&category=` | 제품 상세 |
+| GET | `/api/categories` | 대분류·중분류 계층 목록 |
+| GET | `/api/recommendations?goal=&category=&category2=&page=&pageSize=` | 추천 목록 (기본 pageSize=10) |
+| GET | `/api/products/{id}?goal=&category=&category2=` | 제품 상세 |
 | GET | `/api/search?q=&category=` | 식품명 검색 (q 또는 category 중 하나 이상) |
 
 `goal` 값: `diet` | `high_protein` | `low_sodium` | `low_sugar`

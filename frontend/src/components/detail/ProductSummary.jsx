@@ -3,7 +3,9 @@ import { FoodImage } from '../common/FoodImage'
 import { SurfaceCard } from '../common/SurfaceCard'
 
 export function ProductSummary({ product }) {
-  const category = product.category || '분류 없음'
+  const category = [product.category, product.category2]
+    .filter(Boolean)
+    .join(' · ') || '분류 없음'
   const maker = product.maker || '제조사 정보 없음'
 
   return (

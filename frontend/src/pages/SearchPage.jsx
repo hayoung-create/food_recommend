@@ -56,7 +56,12 @@ export default function SearchPage() {
     let cancelled = false
     fetchCategories()
       .then((data) => {
-        if (!cancelled) setCategories(data.items || [])
+        if (!cancelled) {
+          const items = data.items || []
+          setCategories(
+            items.map((item) => (typeof item === 'string' ? item : item.name)),
+          )
+        }
       })
       .catch(() => {
         if (!cancelled) setCategories([])

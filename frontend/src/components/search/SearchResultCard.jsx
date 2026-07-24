@@ -43,7 +43,8 @@ export function SearchResultCard({
         <span className="min-w-0 flex-1">
           <span className="block truncate font-bold text-ink">{product.name}</span>
           <span className="mt-0.5 block truncate text-sm text-ink-muted">
-            {product.category || '분류 없음'}
+            {[product.category, product.category2].filter(Boolean).join(' · ') ||
+              '분류 없음'}
           </span>
           <span className="mt-1 block truncate text-xs text-ink-muted">
             {formatCalories(product.calories)} · {formatProtein(product.protein)}

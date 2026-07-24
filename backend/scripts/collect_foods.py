@@ -43,6 +43,7 @@ FIELD_MAP = {
     "food_cd": "FOOD_CD",
     "name": "FOOD_NM_KR",
     "category": "FOOD_CAT1_NM",
+    "category2": "FOOD_REF_NM",
     "maker": "MAKER_NM",
     "serving_size": "SERVING_SIZE",
     "calories": "AMT_NUM1",
@@ -103,6 +104,7 @@ def map_item_to_product_dict(item: dict[str, Any]) -> dict[str, Any]:
         "food_cd": item.get("FOOD_CD") or None,
         "name": (item.get("FOOD_NM_KR") or "").strip() or None,
         "category": item.get("FOOD_CAT1_NM") or None,
+        "category2": item.get("FOOD_REF_NM") or None,
         "maker": item.get("MAKER_NM") or None,
         "serving_size": item.get("SERVING_SIZE") or None,
         "calories": parse_float(item.get("AMT_NUM1")),
@@ -281,8 +283,18 @@ def preprocess_report(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return report
 
 
+def ensure_schema() -> None:
+    with engine.connect() as conn:
+        rows = conn.exec_driver_sql("PRAGMA table_info(products)").fetchall()
+        names = {row[1] for row in rows}
+        if rows and "category2" not in names:
+            conn.exec_driver_sql("ALTER TABLE products ADD COLUMN category2 VARCHAR")
+            conn.commit()
+
+
 def upsert_products(rows: list[dict[str, Any]]) -> tuple[int, int]:
     SQLModel.metadata.create_all(engine)
+    ensure_schema()
     inserted = 0
     updated = 0
 
@@ -328,9 +340,10 @@ def main() -> None:
 
     sample = products[0]
     logger.info(
-        "sample: name=%s category=%s maker=%s serving=%s kcal=%s",
+        "sample: name=%s category=%s category2=%s maker=%s serving=%s kcal=%s",
         sample.get("name"),
         sample.get("category"),
+        sample.get("category2"),
         sample.get("maker"),
         sample.get("serving_size"),
         sample.get("calories"),

@@ -110,20 +110,29 @@ def recommend_top5(
     products: list[Any],
     goal: str,
     category: Optional[str] = None,
+    category2: Optional[str] = None,
     top_n: Optional[int] = 5,
     offset: int = 0,
 ) -> dict[str, Any]:
-    """카테고리 지정 시 해당 분류만 점수 계산. 미지정 시 전체."""
+    """카테고리/중분류 지정 시 해당 제품만 점수 계산. 미지정 시 전체."""
     if goal not in VALID_GOALS:
         raise ValueError(f"Invalid goal: {goal}")
     if offset < 0:
         raise ValueError("offset must be >= 0")
 
     scoped = products
-    if category:
+    if category2:
+        scoped = [
+            p
+            for p in products
+            if getattr(p, "category2", None) == category2
+            and (not category or p.category == category)
+        ]
+    elif category:
         scoped = [p for p in products if p.category == category]
 
-    low_sample_warning = bool(category) and len(scoped) < 5
+    filter_active = bool(category or category2)
+    low_sample_warning = filter_active and len(scoped) < 5
     scored = score_products(scoped, goal) if scoped else []
     total = len(scored)
 
@@ -135,7 +144,8 @@ def recommend_top5(
     return {
         "goal": goal,
         "category": category,
-        "scopedNormalization": bool(category),
+        "category2": category2,
+        "scopedNormalization": filter_active,
         "sampleSize": len(scoped),
         "lowSampleWarning": low_sample_warning,
         "total": total,

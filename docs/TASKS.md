@@ -28,7 +28,7 @@
 - [x] B-4. 가중합 → `recommend_score = round(score * 100)` 계산
 - [x] B-5. 동점 시 단백질 높은 순 정렬
 - [x] B-6. 전체 식품 기준 TOP5 추출
-- [x] B-7. 카테고리 지정 시 해당 분류 내 재정규화 TOP5
+- [x] B-7. 카테고리/중분류 지정 시 해당 범위 제품만 점수 정렬
 - [x] B-8. 분류 제품 수 5개 미만일 때 `lowSampleWarning` 플래그
 - [x] B-9. 결측 영양 항목은 점수 0, 응답에는 null/"정보 없음"용 값 유지
 - [x] B-10. 추천 이유 문구 생성 (조건 없으면 기본 문구)
@@ -36,9 +36,9 @@
 ### C. 백엔드 — API
 
 - [x] C-1. `GET /api/goals` — 건강 목표 목록
-- [x] C-2. `GET /api/categories` — DB 식품분류 동적 목록
-- [x] C-3. `GET /api/recommendations` — goal 필수, category 옵션, TOP5 반환
-- [x] C-4. `GET /api/products/{id}` — 상세 영양 + 점수 + 추천 이유 (+ 차트용 카테고리 평균)
+- [x] C-2. `GET /api/categories` — 대분류·중분류 계층 목록
+- [x] C-3. `GET /api/recommendations` — goal 필수, category/category2 옵션, 페이지네이션
+- [x] C-4. `GET /api/products/{id}` — 상세 영양 + 점수 + 추천 이유 (+ 차트용 분류 평균)
 - [x] C-5. `GET /api/search` — 식품명 부분 일치 (공백·대소문자 무시)
 - [x] C-6. 검색/추천 결과 없음·잘못된 goal 등 에러·빈 배열 응답 정리
 - [x] C-7. 런타임 경로에서 공공 API를 호출하지 않음을 확인 (SQLite만 사용)
@@ -62,8 +62,8 @@
 ### F. 프론트엔드 — 추천 결과
 
 - [x] F-1. 선택한 목표 배너 표시
-- [x] F-2. 식품분류 칩 목록 로드·선택
-- [x] F-3. 분류 변경 시 추천 API 재호출 (카테고리 내 재정규화 결과)
+- [x] F-2. 식품분류 2단 칩 목록 로드·선택 (대분류 → 중분류)
+- [x] F-3. 분류 변경 시 추천 API 재호출 (category / category2 필터)
 - [x] F-4. TOP5 제품 카드 리스트 (이름, 분류, 칼로리, 단백질, 점수)
 - [x] F-5. 로딩 / 에러 / 표본 부족 안내 문구
 - [x] F-6. 카드 클릭 시 상세 페이지 이동

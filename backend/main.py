@@ -15,7 +15,7 @@ from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import Session, SQLModel, col, create_engine, select
+from sqlmodel import Session, SQLModel, create_engine, select
 
 from models import Product
 from services.recommendation import (
@@ -41,11 +41,24 @@ engine = create_engine(
     connect_args={"check_same_thread": False},
 )
 
+
+def ensure_schema() -> None:
+    """기존 SQLite에 category2 컬럼이 없으면 추가한다."""
+    with engine.connect() as conn:
+        rows = conn.exec_driver_sql("PRAGMA table_info(products)").fetchall()
+        column_names = {row[1] for row in rows}
+        if "category2" not in column_names:
+            conn.exec_driver_sql(
+                "ALTER TABLE products ADD COLUMN category2 VARCHAR"
+            )
+            conn.commit()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 서버가 켜질 때, 정의된 모델들의 테이블을 자동으로 만든다.
-    # (아직 모델이 없으면 아무것도 안 만들어짐 → 모델을 추가하면 그때 테이블 생성)
     SQLModel.metadata.create_all(engine)
+    ensure_schema()
     yield
 
 
@@ -126,26 +139,64 @@ def list_goals():
 
 @app.get("/api/categories")
 def list_categories():
-    """DB에 존재하는 식품분류 동적 목록 (C-2)."""
+    """대분류·중분류 계층 목록 (C-2).
+
+    응답 예:
+    {
+      "items": [
+        {
+          "name": "밥류",
+          "count": 51,
+          "children": [{"name": "김밥", "count": 8}, ...]
+        }
+      ]
+    }
+    """
     with Session(engine) as session:
-        rows = session.exec(
-            select(Product.category)
-            .where(col(Product.category).is_not(None))
-            .where(Product.category != "")
-            .distinct()
-            .order_by(Product.category)
-        ).all()
-    return {"items": list(rows)}
+        products = list(session.exec(select(Product)).all())
+
+    tree: dict[str, dict[str, object]] = {}
+    for product in products:
+        cat1 = (product.category or "").strip()
+        if not cat1:
+            continue
+        node = tree.setdefault(cat1, {"total": 0, "children": {}})
+        node["total"] = int(node["total"]) + 1
+        cat2 = (product.category2 or "").strip()
+        if cat2 and cat2 != "해당없음":
+            children = node["children"]
+            assert isinstance(children, dict)
+            children[cat2] = int(children.get(cat2, 0)) + 1
+
+    items = []
+    for cat1 in sorted(tree.keys()):
+        node = tree[cat1]
+        children_map = node["children"]
+        assert isinstance(children_map, dict)
+        children = [
+            {"name": name, "count": count}
+            for name, count in sorted(children_map.items(), key=lambda x: x[0])
+        ]
+        items.append(
+            {
+                "name": cat1,
+                "count": int(node["total"]),
+                "children": children,
+            }
+        )
+
+    return {"items": items}
 
 
 @app.get("/api/recommendations")
 def recommendations(
     goal: str = Query(...),
     category: Optional[str] = Query(None),
+    category2: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     pageSize: int = Query(10, ge=1, le=500),
 ):
-    """목표(필수)·분류(옵션) 기준 추천 목록 (페이지네이션)."""
+    """목표(필수)·대분류/중분류(옵션) 기준 추천 목록 (페이지네이션)."""
     _require_goal(goal)
 
     with Session(engine) as session:
@@ -156,6 +207,7 @@ def recommendations(
         products,
         goal,
         category=category,
+        category2=category2,
         top_n=pageSize,
         offset=offset,
     )
@@ -167,6 +219,7 @@ def recommendations(
                 "id": product.id,
                 "name": product.name,
                 "category": product.category,
+                "category2": product.category2,
                 "calories": product.calories,
                 "protein": product.protein,
                 "fat": product.fat,
@@ -181,6 +234,7 @@ def recommendations(
     return {
         "goal": result["goal"],
         "category": result["category"],
+        "category2": result.get("category2"),
         "scopedNormalization": result["scopedNormalization"],
         "sampleSize": result["sampleSize"],
         "lowSampleWarning": result["lowSampleWarning"],
@@ -209,6 +263,7 @@ def product_detail(
     product_id: int,
     goal: str = Query(GOAL_DIET),
     category: Optional[str] = Query(None),
+    category2: Optional[str] = Query(None),
 ):
     """제품 상세 + 점수 + 추천 이유 + 차트용 분류 평균 (C-4)."""
     _require_goal(goal)
@@ -219,11 +274,24 @@ def product_detail(
             raise HTTPException(status_code=404, detail="제품을 찾을 수 없습니다.")
         products = list(session.exec(select(Product)).all())
 
+    # 차트/점수 스코프: 중분류 > 대분류 > 제품 자체 분류
+    scope_category2 = category2 if category2 is not None else None
     scope_category = category if category is not None else product.category
-    if scope_category:
+
+    if scope_category2:
+        scoped = [
+            p
+            for p in products
+            if p.category2 == scope_category2
+            and (not scope_category or p.category == scope_category)
+        ]
+        scope_label = scope_category2
+    elif scope_category:
         scoped = [p for p in products if p.category == scope_category]
+        scope_label = scope_category
     else:
         scoped = products
+        scope_label = None
 
     scored_list = score_products(scoped, goal) if scoped else []
     scored = next((s for s in scored_list if s.product.id == product.id), None)
@@ -238,13 +306,14 @@ def product_detail(
         if scored is None:
             raise HTTPException(status_code=404, detail="제품을 찾을 수 없습니다.")
         scoped = products
-        scope_category = None
+        scope_label = None
 
     averages = _category_averages(scoped)
     return {
         "id": product.id,
         "name": product.name,
         "category": product.category,
+        "category2": product.category2,
         "maker": product.maker,
         "servingSize": product.serving_size,
         "nutrition": {
@@ -260,7 +329,7 @@ def product_detail(
         "recommendScore": scored.recommend_score,
         "reasons": scored.reasons,
         "goal": goal,
-        "scoreScopeCategory": scope_category,
+        "scoreScopeCategory": scope_label,
         "chart": {
             "labels": ["칼로리", "단백질", "지방", "당류", "나트륨"],
             "fields": list(NUTRIENT_FIELDS),

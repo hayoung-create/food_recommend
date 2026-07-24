@@ -25,6 +25,7 @@ export default function ComparePage() {
   const [searchParams] = useSearchParams()
   const goal = searchParams.get('goal') || 'diet'
   const category = searchParams.get('category') || undefined
+  const category2 = searchParams.get('category2') || undefined
   const idsParam = searchParams.get('ids') || ''
   const ids = useMemo(() => parseIds(idsParam), [idsParam])
 
@@ -36,6 +37,7 @@ export default function ComparePage() {
   const isValidGoal = Boolean(GOAL_META[goal])
   const backQuery = new URLSearchParams({ goal })
   if (category) backQuery.set('category', category)
+  if (category2) backQuery.set('category2', category2)
 
   useEffect(() => {
     if (!isValidGoal || ids.length === 0) {
@@ -50,8 +52,14 @@ export default function ComparePage() {
     setError(null)
 
     Promise.all([
-      fetchRecommendations(goal, category, { page: 1, pageSize: 500 }),
-      Promise.all(ids.map((id) => fetchProduct(id, goal, category))),
+      fetchRecommendations(goal, category, {
+        category2,
+        page: 1,
+        pageSize: 500,
+      }),
+      Promise.all(
+        ids.map((id) => fetchProduct(id, goal, category, category2)),
+      ),
     ])
       .then(([reco, details]) => {
         if (cancelled) return
@@ -86,7 +94,7 @@ export default function ComparePage() {
     return () => {
       cancelled = true
     }
-  }, [goal, category, ids, retryKey, isValidGoal])
+  }, [goal, category, category2, ids, retryKey, isValidGoal])
 
   return (
     <div className="min-h-screen bg-background">
@@ -123,7 +131,7 @@ export default function ComparePage() {
               </h2>
               <p className="mt-2 text-sm text-ink-muted">
                 선택한 {products.length}개 제품의 영양성분을 나란히 비교합니다.
-                {category ? ` (분류: ${category})` : ''}
+                {category ? ` (분류: ${category}${category2 ? ` › ${category2}` : ''})` : ''}
               </p>
               <Link
                 to={`/recommend?${backQuery}`}

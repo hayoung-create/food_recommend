@@ -22,6 +22,7 @@ export function ProductCard({
   product,
   goal,
   category,
+  category2,
   selectable = false,
   selected = false,
   onToggleSelect,
@@ -29,12 +30,17 @@ export function ProductCard({
 }) {
   const params = new URLSearchParams({ goal })
   if (category) params.set('category', category)
+  if (category2) params.set('category2', category2)
 
   const nutrients = [
     formatCalories(product.calories),
     formatProtein(product.protein),
     formatFat(product.fat),
   ].join(' · ')
+
+  const categoryLabel = [product.category, product.category2]
+    .filter(Boolean)
+    .join(' · ')
 
   return (
     <div
@@ -76,7 +82,7 @@ export function ProductCard({
           <span className="min-w-0 flex-1">
             <span className="block truncate font-bold text-ink">{product.name}</span>
             <span className="mt-0.5 block truncate text-sm text-ink-muted">
-              {product.category || '분류 없음'}
+              {categoryLabel || '분류 없음'}
             </span>
             <span className="mt-1 block truncate text-xs text-ink-muted">
               {nutrients}
