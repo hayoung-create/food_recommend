@@ -3,8 +3,10 @@ const foodEmojiMap: ReadonlyArray<{ keyword: string; emoji: string }> = [
   { keyword: '잡채밥', emoji: '🍛' },
   { keyword: '카레라이스', emoji: '🍛' },
   { keyword: '하이라이스', emoji: '🍛' },
+  { keyword: '오므라이스', emoji: '🍛' },
 
   { keyword: '김밥', emoji: '🍙' },
+  { keyword: '주먹밥', emoji: '🍙' },
   { keyword: '초밥', emoji: '🍣' },
   { keyword: '국밥', emoji: '🍲' },
 
