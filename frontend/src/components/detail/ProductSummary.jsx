@@ -11,7 +11,6 @@ export function ProductSummary({ product }) {
   return (
     <SurfaceCard className="flex gap-5 p-6">
       <FoodImage
-        category={product.category}
         name={product.name}
         size="lg"
         alt={`${product.name} 대표 이미지`}

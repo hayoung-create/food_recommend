@@ -72,10 +72,8 @@ export function ProductCard({
           </span>
 
           <FoodImage
-            category={product.category}
             name={product.name}
             size="md"
-            className="hidden sm:block"
             alt=""
           />
 

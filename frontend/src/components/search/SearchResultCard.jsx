@@ -34,7 +34,6 @@ export function SearchResultCard({
         className="flex min-w-0 flex-1 items-center gap-3 rounded-button focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
         <FoodImage
-          category={product.category}
           name={product.name}
           size="sm"
           alt=""

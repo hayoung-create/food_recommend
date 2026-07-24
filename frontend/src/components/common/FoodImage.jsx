@@ -1,35 +1,39 @@
-import { FoodIllustrationGraphic } from './FoodIllustrationGraphic'
-import { getFoodIllustrationKey } from '../../utils/foodImages'
+import { getFoodEmoji } from '../../utils/getFoodEmoji'
 
+/** 카드·상세 공통 대표 이모지 아바타 (기본 56px) */
 const SIZE_CLASS = {
-  sm: 'h-12 w-12',
-  md: 'h-14 w-14',
-  lg: 'h-24 w-24',
+  sm: 'h-12 w-12 text-xl',
+  md: 'h-14 w-14 text-2xl',
+  lg: 'h-16 w-16 text-3xl sm:h-[72px] sm:w-[72px]',
 }
 
 /**
- * 제품 썸네일 일러스트 (키워드 매칭 SVG).
- * 외부 사진 URL을 쓰지 않아 네트워크·저작권 이슈가 없다.
+ * 식품명 기반 대표 이모지 썸네일.
+ * 매핑 로직은 getFoodEmoji()에만 둔다.
  */
 export function FoodImage({
-  category,
   name,
   size = 'md',
   className = '',
   alt,
 }) {
   const sizeClass = SIZE_CLASS[size] || SIZE_CLASS.md
-  const type = getFoodIllustrationKey(category, name)
-  const label = alt === '' ? undefined : alt ?? (name ? `${name} 일러스트` : '식품 일러스트')
+  const emoji = getFoodEmoji(name || '')
+  const label =
+    alt === ''
+      ? undefined
+      : (alt ?? (name ? `${name} 대표 이모지` : '식품 대표 이모지'))
 
   return (
     <span
-      className={`inline-block shrink-0 overflow-hidden rounded-xl ${sizeClass} ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center rounded-full bg-primary-soft p-2 shadow-card transition duration-300 ease-premium hover:scale-105 hover:shadow-soft ${sizeClass} ${className}`}
       role={label ? 'img' : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
     >
-      <FoodIllustrationGraphic type={type} />
+      <span className="leading-none" aria-hidden={label ? true : undefined}>
+        {emoji}
+      </span>
     </span>
   )
 }
