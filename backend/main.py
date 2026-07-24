@@ -47,10 +47,17 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="My App API", lifespan=lifespan)
 
-# [배선] 브라우저의 React(다른 포트)에서 이 API를 부를 수 있게 허용 (없으면 CORS 에러)
+# [배선] Vercel 프론트 · 로컬 개발 오리진 허용 (배포 도메인 포함)
+CORS_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://food-recommend-alpha.vercel.app",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # 교육용 전체 허용. 실무에선 도메인 지정
+    allow_origins=CORS_ORIGINS,
+    allow_origin_regex=r"https://food-recommend(-[a-z0-9]+)?-hayoung1129\.vercel\.app",
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -1,10 +1,12 @@
 .env
 backend/.env
-backend/app.db
+# MVP: app.db 는 Render 배포용 시드로 커밋합니다. (런타임 공공 API 호출 없음)
 **/__pycache__/
 backend/.venv/
 backend/venv/
 frontend/node_modules/
 frontend/dist/
+frontend/.env
+frontend/.env.local
 .DS_Store
 .cursor/

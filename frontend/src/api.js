@@ -1,4 +1,14 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
+function resolveApiBaseUrl() {
+  const fromEnv = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '')
+  if (fromEnv) return fromEnv
+  // 로컬 개발에서만 localhost 폴백. 배포 빌드에는 .env.production 필수.
+  if (import.meta.env.DEV) return 'http://127.0.0.1:8000'
+  throw new Error(
+    'VITE_API_BASE_URL이 설정되지 않았습니다. frontend/.env.production 또는 Vercel 환경변수를 확인하세요.',
+  )
+}
+
+const BASE_URL = resolveApiBaseUrl()
 
 async function request(path) {
   const res = await fetch(`${BASE_URL}${path}`)
