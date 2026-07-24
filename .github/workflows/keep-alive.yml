@@ -1,0 +1,45 @@
+# Render free 티어 슬립 방지 — /health 주기 호출
+#
+# 사전 설정 (GitHub 저장소):
+#   Settings → Secrets and variables → Actions → Variables
+#   Name:  RENDER_HEALTH_URL
+#   Value: https://your-service.onrender.com/health
+#
+# Variables 대신 Secrets에 넣어도 됩니다 (같은 이름).
+
+name: Keep Render Alive
+
+on:
+  schedule:
+    # UTC 기준. 약 10분마다 (Render idle ~15분 전에 깨움)
+    - cron: "*/10 * * * *"
+  workflow_dispatch: # 수동 실행용
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Resolve health URL
+        id: url
+        env:
+          FROM_VAR: ${{ vars.RENDER_HEALTH_URL }}
+          FROM_SECRET: ${{ secrets.RENDER_HEALTH_URL }}
+        run: |
+          URL="${FROM_VAR:-$FROM_SECRET}"
+          if [ -z "$URL" ]; then
+            echo "::error::RENDER_HEALTH_URL 이 비어 있습니다. GitHub Variables(또는 Secrets)에 설정하세요."
+            exit 1
+          fi
+          echo "value=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Ping Render /health
+        run: |
+          set -e
+          URL="${{ steps.url.outputs.value }}"
+          echo "GET $URL"
+          curl --fail --silent --show-error --max-time 30 \
+            -H "User-Agent: nutripick-keep-alive" \
+            "$URL"
+          echo
+          echo "OK"
