@@ -48,11 +48,11 @@ export default function RecommendPage() {
       ? `「${category}」`
       : null
 
-  // 분류·목표가 바뀌면 비교 선택만 초기화 (페이지 이동 시 선택은 유지)
+  // 목표가 바뀌면 비교 선택 초기화 (분류·페이지 변경 시에는 최대 5개까지 유지)
   useEffect(() => {
     setSelectedIds([])
     setLimitMessage(null)
-  }, [goal, category, category2])
+  }, [goal])
 
   useEffect(() => {
     if (!isValidGoal) return
