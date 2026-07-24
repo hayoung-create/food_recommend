@@ -53,6 +53,7 @@ const foodEmojiMap: ReadonlyArray<{ keyword: string; emoji: string }> = [
   { keyword: '증편', emoji: '🍡' },
   { keyword: '약식', emoji: '🍘' },
   { keyword: '인절미', emoji: '🍡' },
+  { keyword: '송편', emoji: '🍡' },
   { keyword: '떡', emoji: '🍡' },
 
   { keyword: '피자빵', emoji: '🍕' },
