@@ -47,6 +47,17 @@ REASON_TEMPLATES_BY_GOAL: dict[str, dict[str, str]] = {
     },
 }
 
+CONTRIBUTION_LABELS: dict[str, str] = {
+    "calories": "열량 기여도",
+    "protein": "단백질 기여도",
+    "fat": "지방 기여도",
+    "sugar": "당류 기여도",
+    "sodium": "나트륨 기여도",
+    "saturated_fat": "포화지방 기여도",
+    "cholesterol": "콜레스테롤 기여도",
+    "carb": "탄수화물 기여도",
+}
+
 
 @dataclass
 class ScoredProduct:
@@ -55,6 +66,43 @@ class ScoredProduct:
     component_scores: dict[str, float]
     reasons: list[str]
     penalty: float = 0.0
+
+
+def build_score_breakdown(
+    goal: str,
+    component_scores: dict[str, float],
+    penalty: float,
+    recommend_score: int,
+) -> dict[str, Any]:
+    """기존 가중합·패널티를 항목별 기여도로 분해 (점수 재계산 없음)."""
+    weights = GOAL_WEIGHTS[goal]
+    items: list[dict[str, Any]] = []
+    for field, weight in weights.items():
+        points = float(component_scores.get(field, 0.0)) * float(weight)
+        items.append(
+            {
+                "key": field,
+                "label": CONTRIBUTION_LABELS.get(field, field),
+                "points": round(points, 1),
+                "kind": "plus",
+            }
+        )
+    items.sort(key=lambda item: item["points"], reverse=True)
+
+    if penalty > 0:
+        items.append(
+            {
+                "key": "penalty",
+                "label": "패널티",
+                "points": -round(float(penalty), 1),
+                "kind": "minus",
+            }
+        )
+
+    return {
+        "items": items,
+        "finalScore": int(recommend_score),
+    }
 
 
 def build_reasons(

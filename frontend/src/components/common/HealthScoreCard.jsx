@@ -9,10 +9,32 @@ function scoreCaption(score, goalId) {
   return `${label} 기준으로 참고해 보세요`
 }
 
-export function HealthScoreCard({ score, goalId, rank, scopeLabel }) {
+export function HealthScoreCard({
+  score,
+  goalId,
+  rank,
+  scopeLabel,
+  onScoreClick,
+  scoreClickHint = '점수 영역을 눌러 추천 근거를 확인하세요',
+}) {
+  const interactive = typeof onScoreClick === 'function'
+
   return (
     <SurfaceCard className="flex flex-col items-center gap-5 p-6 sm:flex-row sm:items-center sm:gap-8">
-      <CircularProgress value={score} emoji="❤️" label="Health Score" />
+      {interactive ? (
+        <button
+          type="button"
+          onClick={onScoreClick}
+          className="rounded-full transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+          aria-haspopup="dialog"
+          aria-label={`추천 점수 ${score}점. 추천 근거 분석 열기`}
+        >
+          <CircularProgress value={score} emoji="❤️" label="Health Score" />
+        </button>
+      ) : (
+        <CircularProgress value={score} emoji="❤️" label="Health Score" />
+      )}
+
       <div className="min-w-0 flex-1 text-center sm:text-left">
         <p className="text-sm font-medium text-ink-muted">추천 적합도</p>
         <h3 className="mt-1 text-2xl font-bold text-ink">
@@ -21,6 +43,9 @@ export function HealthScoreCard({ score, goalId, rank, scopeLabel }) {
         <p className="mt-2 text-sm text-ink-muted">
           {scoreCaption(score, goalId)}
         </p>
+        {interactive ? (
+          <p className="mt-2 text-xs font-medium text-primary">{scoreClickHint}</p>
+        ) : null}
         <div className="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
           {rank ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary">

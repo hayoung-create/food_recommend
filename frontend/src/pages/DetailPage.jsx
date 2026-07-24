@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { fetchProduct } from '../api'
+import { AdaptivePanel } from '../components/common/AdaptivePanel'
 import { ErrorState } from '../components/common/ErrorState'
 import { HealthScoreCard } from '../components/common/HealthScoreCard'
 import { NutrientCardGrid } from '../components/common/NutrientCardGrid'
@@ -9,6 +10,7 @@ import { SurfaceCard } from '../components/common/SurfaceCard'
 import { NutritionChart } from '../components/detail/NutritionChart'
 import { ProductSummary } from '../components/detail/ProductSummary'
 import { ReasonList } from '../components/detail/ReasonList'
+import { ScoreBreakdownCard } from '../components/detail/ScoreBreakdownCard'
 import { Header } from '../components/layout/Header'
 import { PageContainer } from '../components/layout/PageContainer'
 
@@ -23,11 +25,15 @@ export default function DetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [retryKey, setRetryKey] = useState(0)
+  const [breakdownOpen, setBreakdownOpen] = useState(false)
+
+  const closeBreakdown = useCallback(() => setBreakdownOpen(false), [])
 
   useEffect(() => {
     let cancelled = false
     setLoading(true)
     setError(null)
+    setBreakdownOpen(false)
 
     fetchProduct(id, goal, category || undefined, category2 || undefined)
       .then((data) => {
@@ -52,6 +58,8 @@ export default function DetailPage() {
     ? `「${product.scoreScopeCategory}」 분류 기준`
     : '전체 식품 기준'
 
+  const canOpenBreakdown = Boolean(product?.scoreBreakdown?.items?.length)
+
   return (
     <div className="min-h-screen bg-background">
       <Header title="제품 상세" showBack showSearch={false} />
@@ -72,6 +80,9 @@ export default function DetailPage() {
               score={product.recommendScore}
               goalId={product.goal}
               scopeLabel={scopeLabel}
+              onScoreClick={
+                canOpenBreakdown ? () => setBreakdownOpen(true) : undefined
+              }
             />
             <NutrientCardGrid nutrition={product.nutrition} />
             <NutritionChart
@@ -86,6 +97,14 @@ export default function DetailPage() {
           </>
         ) : null}
       </PageContainer>
+
+      <AdaptivePanel
+        open={breakdownOpen && canOpenBreakdown}
+        onClose={closeBreakdown}
+        title="추천 근거 분석"
+      >
+        <ScoreBreakdownCard breakdown={product?.scoreBreakdown} embedded />
+      </AdaptivePanel>
     </div>
   )
 }

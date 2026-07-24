@@ -25,6 +25,7 @@ from services.recommendation import (
     GOAL_LOW_SUGAR,
     NUTRIENT_FIELDS,
     VALID_GOALS,
+    build_score_breakdown,
     recommend_top5,
     score_products,
 )
@@ -328,6 +329,12 @@ def product_detail(
         },
         "recommendScore": scored.recommend_score,
         "reasons": scored.reasons,
+        "scoreBreakdown": build_score_breakdown(
+            goal,
+            scored.component_scores,
+            scored.penalty,
+            scored.recommend_score,
+        ),
         "goal": goal,
         "scoreScopeCategory": scope_label,
         "chart": {
