@@ -5,6 +5,7 @@ import {
   formatFat,
   formatProtein,
 } from '../../utils/format'
+import { CompareCheckbox } from '../common/CompareCheckbox'
 import { FoodImage } from '../common/FoodImage'
 
 const RANK_STYLES = {
@@ -35,12 +36,6 @@ export function ProductCard({
     formatFat(product.fat),
   ].join(' · ')
 
-  const handleCheckboxChange = (event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    onToggleSelect?.(product.id)
-  }
-
   return (
     <div
       className={`surface-card flex min-h-11 flex-col gap-3 p-4 transition duration-300 ease-out sm:flex-row sm:items-center sm:gap-4 sm:p-5 ${
@@ -50,17 +45,12 @@ export function ProductCard({
       }`}
     >
       {selectable ? (
-        <label className="flex min-h-11 shrink-0 cursor-pointer items-center gap-2 sm:pr-1">
-          <input
-            type="checkbox"
-            checked={selected}
-            disabled={selectDisabled && !selected}
-            onChange={handleCheckboxChange}
-            onClick={(event) => event.stopPropagation()}
-            className="h-5 w-5 rounded-md border-border text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50"
-            aria-label={`${product.name} 비교 선택`}
-          />
-        </label>
+        <CompareCheckbox
+          checked={selected}
+          disabled={selectDisabled && !selected}
+          label={`${product.name} 비교 선택`}
+          onToggle={() => onToggleSelect?.(Number(product.id))}
+        />
       ) : null}
 
       <Link

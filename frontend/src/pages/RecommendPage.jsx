@@ -144,17 +144,21 @@ export default function RecommendPage() {
   )
 
   const handleToggleSelect = useCallback((productId) => {
+    const id = Number(productId)
+    if (!Number.isFinite(id)) return
+
     setSelectedIds((prev) => {
-      if (prev.includes(productId)) {
+      const exists = prev.some((value) => Number(value) === id)
+      if (exists) {
         setLimitMessage(null)
-        return prev.filter((id) => id !== productId)
+        return prev.filter((value) => Number(value) !== id)
       }
       if (prev.length >= MAX_COMPARE) {
         setLimitMessage(`비교는 최대 ${MAX_COMPARE}개까지 선택할 수 있습니다.`)
         return prev
       }
       setLimitMessage(null)
-      return [...prev, productId]
+      return [...prev, id]
     })
   }, [])
 
@@ -255,7 +259,9 @@ export default function RecommendPage() {
                           goal={goal}
                           category={category || undefined}
                           selectable
-                          selected={selectedIds.includes(product.id)}
+                          selected={selectedIds.some(
+                            (value) => Number(value) === Number(product.id),
+                          )}
                           onToggleSelect={handleToggleSelect}
                           selectDisabled={atLimit}
                         />

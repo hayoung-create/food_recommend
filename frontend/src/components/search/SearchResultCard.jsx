@@ -1,6 +1,7 @@
 import { ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { formatCalories, formatProtein } from '../../utils/format'
+import { CompareCheckbox } from '../common/CompareCheckbox'
 import { FoodImage } from '../common/FoodImage'
 
 export function SearchResultCard({
@@ -11,12 +12,6 @@ export function SearchResultCard({
   onToggleSelect,
   selectDisabled = false,
 }) {
-  const handleCheckboxChange = (event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    onToggleSelect?.(product.id)
-  }
-
   return (
     <div
       className={`surface-card flex min-h-[72px] items-center gap-3 p-5 transition duration-300 ease-out ${
@@ -26,17 +21,12 @@ export function SearchResultCard({
       }`}
     >
       {selectable ? (
-        <label className="flex min-h-11 shrink-0 cursor-pointer items-center">
-          <input
-            type="checkbox"
-            checked={selected}
-            disabled={selectDisabled && !selected}
-            onChange={handleCheckboxChange}
-            onClick={(event) => event.stopPropagation()}
-            className="h-5 w-5 rounded-md border-border text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50"
-            aria-label={`${product.name} 비교 선택`}
-          />
-        </label>
+        <CompareCheckbox
+          checked={selected}
+          disabled={selectDisabled && !selected}
+          label={`${product.name} 비교 선택`}
+          onToggle={() => onToggleSelect?.(Number(product.id))}
+        />
       ) : null}
 
       <Link
