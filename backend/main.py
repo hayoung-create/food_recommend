@@ -10,7 +10,7 @@
     → 브라우저에서 http://127.0.0.1:8000/health 로 확인
 """
 from contextlib import asynccontextmanager
-
+from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Query
@@ -33,9 +33,13 @@ from services.recommendation import (
 # [배선] DB 연결 (SQLite) — 이 부분은 그대로 두고, 아래에 모델만 추가하면 됩니다.
 #   · check_same_thread=False : FastAPI에서 SQLite를 쓸 때 필요한 설정
 #     (이걸 빠뜨리면 초보가 잡기 어려운 에러가 나서, 미리 넣어 둠)
+#   · 경로는 main.py 기준 절대경로 (Render cwd와 무관하게 backend/app.db 사용)
 # --------------------------------------------------------------------------
-engine = create_engine("sqlite:///app.db", connect_args={"check_same_thread": False})
-
+DB_PATH = Path(__file__).resolve().parent / "app.db"
+engine = create_engine(
+    f"sqlite:///{DB_PATH.as_posix()}",
+    connect_args={"check_same_thread": False},
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
